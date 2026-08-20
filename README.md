@@ -75,6 +75,18 @@ Bootstrap is idempotent. Safe to re-run.
 
 ---
 
+## Link preview (WhatsApp card)
+
+WhatsApp / iMessage / Slack read **Open Graph** tags in `<head>`:
+
+- `og:title`, `og:description`
+- `og:image` → absolute HTTPS URL: `https://jamzilla.dr-data-dude.com/og-image.jpg`
+
+`og-image.jpg` is a 1200×630 crop of the hero session shot. WhatsApp **caches**
+previews hard — after you change the image, paste the URL in a **new** chat
+thread, or append `?v=2` once to bust cache. Facebook’s debugger also works:
+https://developers.facebook.com/tools/debug/
+
 ## Everyday ship
 
 ```bash

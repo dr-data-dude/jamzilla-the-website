@@ -41,13 +41,16 @@ jobs:
           role-to-assume: ${{ steps.cfg.outputs.role_arn }}
           aws-region: ${{ steps.cfg.outputs.aws_region }}
 
-      - name: Upload index.html to S3
+      - name: Upload site files to S3
         run: |
           set -euo pipefail
           aws s3 cp index.html "s3://${{ steps.cfg.outputs.s3_bucket }}/index.html" \
             --content-type 'text/html; charset=utf-8' \
             --cache-control 'public, max-age=60'
-          # Optional future assets/ folder — longer cache, ignore if missing.
+          # Link-preview image (WhatsApp / Open Graph) — absolute URL in meta tags.
+          aws s3 cp og-image.jpg "s3://${{ steps.cfg.outputs.s3_bucket }}/og-image.jpg" \
+            --content-type 'image/jpeg' \
+            --cache-control 'public, max-age=86400'
           if [[ -d assets ]]; then
             aws s3 sync assets "s3://${{ steps.cfg.outputs.s3_bucket }}/assets" \
               --delete \
