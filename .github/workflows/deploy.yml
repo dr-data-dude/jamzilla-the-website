@@ -51,6 +51,16 @@ jobs:
           aws s3 cp og-image.jpg "s3://${{ steps.cfg.outputs.s3_bucket }}/og-image.jpg" \
             --content-type 'image/jpeg' \
             --cache-control 'public, max-age=86400'
+          # Browser tab icons
+          aws s3 cp favicon.svg "s3://${{ steps.cfg.outputs.s3_bucket }}/favicon.svg" \
+            --content-type 'image/svg+xml' \
+            --cache-control 'public, max-age=86400'
+          aws s3 cp favicon-32.png "s3://${{ steps.cfg.outputs.s3_bucket }}/favicon-32.png" \
+            --content-type 'image/png' \
+            --cache-control 'public, max-age=86400'
+          aws s3 cp apple-touch-icon.png "s3://${{ steps.cfg.outputs.s3_bucket }}/apple-touch-icon.png" \
+            --content-type 'image/png' \
+            --cache-control 'public, max-age=86400'
           if [[ -d assets ]]; then
             aws s3 sync assets "s3://${{ steps.cfg.outputs.s3_bucket }}/assets" \
               --delete \
