@@ -1,0 +1,80 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: jamzilla-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load deploy.env
+        id: cfg
+        run: |
+          set -euo pipefail
+          test -f infra/deploy.env
+          # shellcheck disable=SC1091
+          set -a && source infra/deploy.env && set +a
+          {
+            echo "aws_region=${AWS_REGION}"
+            echo "s3_bucket=${S3_BUCKET}"
+            echo "distribution_id=${CLOUDFRONT_DISTRIBUTION_ID}"
+            echo "domain=${DOMAIN}"
+            echo "role_arn=${AWS_ROLE_ARN}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ steps.cfg.outputs.role_arn }}
+          aws-region: ${{ steps.cfg.outputs.aws_region }}
+
+      - name: Upload index.html to S3
+        run: |
+          set -euo pipefail
+          aws s3 cp index.html "s3://${{ steps.cfg.outputs.s3_bucket }}/index.html" \
+            --content-type 'text/html; charset=utf-8' \
+            --cache-control 'public, max-age=60'
+          # Optional future assets/ folder — longer cache, ignore if missing.
+          if [[ -d assets ]]; then
+            aws s3 sync assets "s3://${{ steps.cfg.outputs.s3_bucket }}/assets" \
+              --delete \
+              --cache-control 'public, max-age=86400'
+          fi
+
+      - name: Invalidate CloudFront
+        run: |
+          set -euo pipefail
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ steps.cfg.outputs.distribution_id }}" \
+            --paths '/*'
+
+      - name: Smoke public URL
+        run: |
+          set -euo pipefail
+          URL="https://${{ steps.cfg.outputs.domain }}"
+          echo "Probing ${URL}"
+          for i in $(seq 1 30); do
+            CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "${URL}" || true)"
+            echo "  try ${i}: HTTP ${CODE}"
+            if [[ "${CODE}" == "200" ]]; then
+              TITLE="$(curl -sS --max-time 15 "${URL}" | tr '\n' ' ' | grep -o '<title>[^<]*</title>' | head -1 || true)"
+              echo "  ${TITLE}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Smoke failed — ${URL} never returned 200" >&2
+          exit 1
