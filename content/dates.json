@@ -1,0 +1,34 @@
+{
+  "project": "Jamzilla",
+  "notes": [
+    "Landing finale dates — keep index.html footer in sync with this file.",
+    "More session dates will be added as they lock."
+  ],
+  "next_session": {
+    "label": "Next session",
+    "start": "2026-12-18",
+    "end": "2026-12-20",
+    "display": "Dec 18–20",
+    "year": 2026,
+    "follow_up": "More dates will follow."
+  },
+  "wedding": {
+    "label": "The Wedding",
+    "date": "2027-06-12",
+    "display": "June 12, 2027"
+  },
+  "links": {
+    "lineup": {
+      "label": "Lineup",
+      "url": "/lineup/"
+    },
+    "wedding_set_list": {
+      "label": "Wedding set list",
+      "url": "https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE"
+    },
+    "listen": {
+      "label": "Listen to the tapes",
+      "url": "/listen/"
+    }
+  }
+}
