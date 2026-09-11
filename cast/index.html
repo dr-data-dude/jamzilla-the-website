@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JAMZILLA — Cast</title>
+<meta name="description" content="Jamzilla wedding sessions cast — who is in the room.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A09;
+  --bone:#EAE4D8;
+  --red:#FF2B18;
+  --smoke:#7A756C;
+  --line:color-mix(in srgb, var(--bone) 16%, transparent);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--bone);
+  font-family:'Space Mono',monospace;
+  min-height:100svh;
+  -webkit-font-smoothing:antialiased;
+}
+.grain{
+  position:fixed;inset:-100px;z-index:50;pointer-events:none;opacity:.09;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.top{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;
+  background:color-mix(in srgb, var(--ink) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.brand{
+  font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:.04em;
+  color:var(--bone);text-decoration:none;text-transform:uppercase;
+}
+.brand span{color:var(--red)}
+.nav a{
+  color:var(--smoke);text-decoration:none;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;margin-left:14px;
+}
+.nav a:hover,.nav a[aria-current="page"]{color:var(--bone)}
+main{
+  max-width:720px;margin:0 auto;
+  padding:28px 18px calc(env(safe-area-inset-bottom) + 48px);
+}
+.kicker{
+  color:var(--smoke);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+h1{
+  font-family:'Anton',sans-serif;font-size:clamp(2.4rem, 8vw, 3.6rem);
+  line-height:.95;text-transform:uppercase;margin-bottom:10px;
+}
+.lede{color:var(--smoke);max-width:40ch;margin-bottom:32px;line-height:1.5}
+.roster{list-style:none;display:grid;gap:0}
+.roster li{
+  display:grid;
+  grid-template-columns:3rem 1fr;
+  gap:14px;
+  align-items:baseline;
+  padding:14px 0;
+  border-top:1px solid var(--line);
+  opacity:0;
+  transform:translateY(8px);
+  animation:rise .45s ease forwards;
+}
+.roster li:last-child{border-bottom:1px solid var(--line)}
+.num{
+  font-family:'Space Mono',monospace;
+  font-size:11px;letter-spacing:.12em;
+  color:var(--smoke);
+}
+.name{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(1.35rem, 4.5vw, 1.75rem);
+  letter-spacing:.03em;text-transform:uppercase;
+  line-height:1.05;
+}
+.legal{
+  display:block;
+  margin-top:4px;
+  color:var(--smoke);
+  font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;
+}
+@keyframes rise{
+  to{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .roster li{opacity:1;transform:none;animation:none}
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="top">
+  <a class="brand" href="/">Jam<span>zilla</span></a>
+  <nav class="nav" aria-label="Site">
+    <a href="/">Home</a>
+    <a href="/listen/">Listen</a>
+    <a href="/lineup/">Lineup</a>
+  </nav>
+</header>
+<main>
+  <p class="kicker">Wedding sessions</p>
+  <h1>Cast</h1>
+  <p class="lede">Who is in the room — names as we call them on stage. The live song × musician spreadsheet is <a href="/lineup/" style="color:var(--red)">Lineup</a>.</p>
+  <ol class="roster" id="roster"></ol>
+</main>
+<script>
+const MEMBERS = [
+  {display:"Matt", legal:"Matt Divine"},
+  {display:"Greg", legal:"Gregory Bowden"},
+  {display:"Chamba", legal:"Salvador Castaneda Vega"},
+  {display:"Alex", legal:"Alex Davydov"},
+  {display:"Dean", legal:null},
+  {display:"Mackey", legal:"Mackey Divine"},
+  {display:"Helmut", legal:null},
+  {display:"Thomas", legal:"Thomas Heß"},
+  {display:"Pree", legal:"Priantha Kamaladiwala"},
+  {display:"Leo", legal:"Leonhard Gründer"},
+  {display:"Kenneth", legal:"Kenneth Möller"},
+  {display:"Nuno", legal:"Nuno Pires"},
+  {display:"Michael", legal:"Michael Walker"},
+  {display:"Manuel", legal:"Manuel Dahm"}
+];
+
+const root = document.getElementById('roster');
+root.innerHTML = MEMBERS.map((member, index) => {
+  const n = String(index + 1).padStart(2, '0');
+  const legal = member.legal && member.legal !== member.display
+    ? `<span class="legal">${member.legal}</span>`
+    : '';
+  return `<li style="animation-delay:${index * 40}ms">
+    <span class="num">${n}</span>
+    <span>
+      <span class="name">${member.display}</span>
+      ${legal}
+    </span>
+  </li>`;
+}).join('');
+</script>
+</body>
+</html>

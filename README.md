@@ -102,7 +102,7 @@ Workflow `.github/workflows/deploy.yml`:
 1. Assume `github-actions-jamzilla-the-website` via OIDC  
 2. Upload HTML / icons / assets; sync `audio/` only when that tree exists in the runner  
 3. Invalidate CloudFront paths `/*`  
-4. Smoke `https://jamzilla.dr-data-dude.com` (pretty `/listen/` + `/lineup/`, and ready `/audio/*.mp3` as `audio/mpeg`)
+4. Smoke `https://jamzilla.dr-data-dude.com` (pretty `/listen/` + `/lineup/` gateway → band desk, and ready `/audio/*.mp3` as `audio/mpeg`)
 
 Manual re-run: Actions → Deploy → Run workflow.
 
