@@ -1,12 +1,12 @@
 {
   "project": "Jamzilla",
   "source": "Numbers: Jamzilla-Notes on Songs and Videos → Songs For Website",
-  "lede": "Room heat on tape, wedding nights that glow — Jamzilla sessions: press play and go.",
+  "lede": "The live takes have hit the streets. Have a listen and get pulled into the sauce.",
   "notes": [
-    "These are the recorded Jamzilla session cuts — not Spotify playlists.",
+    "These are the recorded Jamzilla: The Wedding Sessions cuts — not Spotify playlists.",
     "Cuts come from Nextcloud/session master files with start/end timings.",
     "audio_url is relative to the teaser site root when a cut is ready.",
-    "lede is the public Listen-page couplet (HTML may break the em dash across two lines)."
+    "lede is the public Listen-page guest blurb."
   ],
   "set_list": {
     "label": "Wedding set list",
