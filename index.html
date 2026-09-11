@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>JAMZILLA</title>
 <meta name="description" content="Next session Dec 18–20, 2026. More dates will follow. The Wedding: June 12, 2027.">
 <link rel="canonical" href="https://jamzilla.dr-data-dude.com/">
@@ -36,12 +36,18 @@
   --smoke:#7A756C;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  overflow-x:clip;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
 body{
   background:var(--ink);
   color:var(--bone);
   font-family:'Space Mono',monospace;
-  overflow-x:hidden;
+  overflow-x:clip;
+  max-width:100%;
   -webkit-font-smoothing:antialiased;
 }
 /* ---------- film grain ---------- */
@@ -55,15 +61,28 @@ body{
   0%{transform:translate(0,0)}25%{transform:translate(-30px,20px)}
   50%{transform:translate(20px,-30px)}75%{transform:translate(-20px,-20px)}100%{transform:translate(0,0)}
 }
-/* ---------- rec badge ---------- */
-.rec{
-  position:fixed;top:calc(env(safe-area-inset-top) + 14px);right:16px;z-index:60;
-  display:flex;align-items:center;gap:7px;
-  font-size:11px;letter-spacing:.2em;color:var(--bone);
+/* ---------- top-right rail (REC + session Log out) ---------- */
+.auth-rail{
+  position:fixed;
+  top:calc(env(safe-area-inset-top) + 14px);
+  right:max(12px, env(safe-area-inset-right));
+  z-index:70;
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:8px;
+  max-width:calc(100vw - 88px);
+  pointer-events:none;
   mix-blend-mode:difference;
 }
+.rec{
+  display:flex;align-items:center;gap:6px;
+  flex:none;
+  font-size:11px;letter-spacing:.16em;color:var(--bone);
+  white-space:nowrap;
+}
 .rec::before{
-  content:'';width:9px;height:9px;border-radius:50%;
+  content:'';width:9px;height:9px;border-radius:50%;flex:none;
   background:var(--red);
   animation:blink 1.4s steps(1) infinite;
   box-shadow:0 0 12px var(--red);
@@ -78,38 +97,37 @@ body{
   transform:translateX(-50%);
   z-index:65;
   font-family:'Anton',sans-serif;
-  font-size:clamp(1.1rem, 3.5vw, 1.55rem);
+  font-size:clamp(1.05rem, 3.2vw, 1.55rem);
   letter-spacing:.06em;
   text-transform:uppercase;
   color:var(--bone);
   pointer-events:none;
-  max-width:min(46vw, 220px);
+  max-width:min(38vw, 180px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
   text-align:center;
   line-height:1.1;
   text-shadow:0 1px 12px rgb(10 10 9 / 70%);
 }
 .auth-name[hidden]{display:none!important}
 .auth-logout{
-  position:fixed;
-  top:calc(env(safe-area-inset-top) + 14px);
-  right:16px;
-  z-index:70;
   display:flex;align-items:center;
-  margin:0;padding:0;
+  margin:0;padding:10px 0 10px 2px;
   border:none;background:transparent;
   min-height:44px;
   font-family:'Space Mono',monospace;
-  font-size:11px;letter-spacing:.2em;color:var(--bone);
+  font-size:11px;letter-spacing:.1em;color:var(--bone);
   text-transform:uppercase;
-  mix-blend-mode:difference;
+  white-space:nowrap;
+  flex:none;
+  pointer-events:auto;
   cursor:pointer;
 }
 .auth-logout:hover{color:var(--red)}
 .auth-logout:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 .auth-logout[hidden]{display:none!important}
-body.has-session .rec{
-  right:108px;
-}
+body:not(.has-session) .auth-logout{display:none!important}
 
 /* ---------- big mac (sticky menu) ---------- */
 .bigmac{
@@ -423,8 +441,10 @@ h1 .zilla{
   </div>
 </nav>
 <p class="auth-name" id="auth-name" hidden></p>
-<button type="button" class="auth-logout" id="auth-logout" hidden>Log out</button>
-<div class="rec" aria-hidden="true">REC</div>
+<div class="auth-rail" id="auth-rail">
+  <div class="rec" aria-hidden="true">REC</div>
+  <button type="button" class="auth-logout" id="auth-logout" hidden>Log out</button>
+</div>
 
 <!-- HERO -->
 <header class="hero">
