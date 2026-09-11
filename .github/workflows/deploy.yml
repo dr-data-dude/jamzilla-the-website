@@ -1,9 +1,13 @@
-name: Deploy
+name: Deploy (RETIRED — CloudFront no longer the live origin)
 
+# Option A (2026-09-12): live site is Mini behind edge nginx.
+# Do not sync to S3/CloudFront. Keep workflow for break-glass only.
 on:
-  push:
-    branches: [main, master]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type RETIRED-BREAK-GLASS to run anyway'
+        required: true
 
 permissions:
   id-token: write
@@ -15,6 +19,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event.inputs.confirm == 'RETIRED-BREAK-GLASS'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
