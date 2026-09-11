@@ -70,6 +70,50 @@ body{
 }
 @keyframes blink{50%{opacity:.15}}
 
+/* ---------- auth chrome (band :8791 session) ---------- */
+.auth-name{
+  position:fixed;
+  top:calc(env(safe-area-inset-top) + 18px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:65;
+  font-family:'Anton',sans-serif;
+  font-size:clamp(1.1rem, 3.5vw, 1.55rem);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--bone);
+  pointer-events:none;
+  max-width:min(46vw, 220px);
+  text-align:center;
+  line-height:1.1;
+  text-shadow:0 1px 12px rgb(10 10 9 / 70%);
+}
+.auth-name[hidden]{display:none!important}
+.auth-logout{
+  position:fixed;
+  top:calc(env(safe-area-inset-top) + 10px);
+  right:16px;
+  z-index:70;
+  min-height:44px;
+  padding:10px 14px;
+  border:1px solid color-mix(in srgb, var(--bone) 35%, transparent);
+  background:rgb(10 10 9 / 72%);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  color:var(--bone);
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.auth-logout:hover{border-color:var(--red);color:var(--red)}
+.auth-logout:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.auth-logout[hidden]{display:none!important}
+body.has-session .rec{
+  right:118px;
+}
+
 /* ---------- big mac (sticky menu) ---------- */
 .bigmac{
   position:fixed;
@@ -374,14 +418,16 @@ h1 .zilla{
   <div class="mac-group">
     <p class="mac-section">Jamzilla · the wedding sessions</p>
     <a class="mac-link" href="https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE" target="_blank" rel="noopener noreferrer">Spotify playlist</a>
-    <a class="mac-link" href="/lineup/">Lineup desk <small>login</small></a>
+    <a class="mac-link" href="/lineup/">Lineup</a>
   </div>
   <div class="mac-group">
     <p class="mac-section">Jamzilla 2025</p>
     <a class="mac-link" href="/listen/">All recordings</a>
   </div>
 </nav>
-<div class="rec">REC</div>
+<p class="auth-name" id="auth-name" hidden></p>
+<button type="button" class="auth-logout" id="auth-logout" hidden>Log out</button>
+<div class="rec" aria-hidden="true">REC</div>
 
 <!-- HERO -->
 <header class="hero">
@@ -465,7 +511,7 @@ h1 .zilla{
   <h3>Dec 18–20<span class="cursor">_</span></h3>
   <p class="tease">2026 · More dates will follow.<br><b>The Wedding: June 12, 2027</b></p>
   <p class="band-cta">
-    <a href="/lineup/">Lineup desk</a>
+    <a href="/lineup/">Lineup</a>
     <span aria-hidden="true"> · </span>
     <a href="https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE" target="_blank" rel="noopener noreferrer">Wedding set list</a><br>
     <a class="tapes" href="/listen/">Listen to the tapes</a>
@@ -532,6 +578,40 @@ drawer.querySelectorAll('a').forEach(a=>{
 document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape') setMac(false);
 });
+
+// band session chrome (no-op on public CloudFront without /api/me)
+(async function bootSessionChrome(){
+  const nameEl = document.getElementById('auth-name');
+  const logoutEl = document.getElementById('auth-logout');
+  if(!nameEl || !logoutEl) return;
+  let me = null;
+  try{
+    const res = await fetch('/api/me', {credentials:'same-origin'});
+    if(!res.ok) return;
+    const data = await res.json();
+    me = data && data.me;
+  }catch(_){
+    return;
+  }
+  if(!me){
+    // On :8791 the server should have gated /, but still bounce if cookie died.
+    if(location.port === '8791' || location.hostname === '127.0.0.1' || location.hostname === 'localhost'){
+      location.replace('/');
+    }
+    return;
+  }
+  document.body.classList.add('has-session');
+  nameEl.hidden = false;
+  nameEl.textContent = me.display_name || me.username;
+  logoutEl.hidden = false;
+  logoutEl.addEventListener('click', async ()=>{
+    try{
+      await fetch('/api/logout', {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:'{}'});
+    }catch(_){}
+    location.replace('/');
+  });
+})();
+
 </script>
 </body>
 </html>
