@@ -1,0 +1,25 @@
+{
+  "project": "Jamzilla",
+  "notes": [
+    "Big Mac: equal section heads — wedding sessions (Spotify + lineup) then Jamzilla 2025 (all recordings).",
+    "Listening = recorded Jamzilla session cuts — see recordings.json + /listen/."
+  ],
+  "wedding_sessions": {
+    "label": "Jamzilla: the wedding sessions",
+    "spotify": {
+      "label": "Spotify playlist",
+      "url": "https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE"
+    },
+    "lineup": {
+      "label": "Lineup",
+      "url": "/lineup/"
+    }
+  },
+  "jamzilla_2025": {
+    "label": "Jamzilla 2025",
+    "all_recordings": {
+      "label": "All recordings",
+      "url": "/listen/"
+    }
+  }
+}

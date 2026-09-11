@@ -1,0 +1,153 @@
+{
+  "project": "Jamzilla",
+  "source": "WhatsApp group → Search members (18 people)",
+  "captured_at": "2026-09-11",
+  "screenshots": [
+    "Screenshot_2026-09-11_at_17.54.01",
+    "Screenshot_2026-09-11_at_17.54.25",
+    "Screenshot_2026-09-11_at_17.54.41"
+  ],
+  "notes": [
+    "WhatsApp shows 18 people; 17 unique contacts are visible across the screenshots.",
+    "Section A was not photographed — one member is still missing (often the group owner / Mathew).",
+    "Salvador Castaneda Vega → nickname Chamba (Mathew).",
+    "Priantha (Pree) Kamaladiwala → nickname Pree from WhatsApp display.",
+    "usernames are Jamzilla login slugs — lowercase ASCII, nickname preferred when known.",
+    "Display names: Matt (not Mathew), Greg (Gregory Bowden).",
+    "Walter removed from band grid roster (2026-09-11).",
+    "Manuel moved to end of roster.",
+    "Andy removed from band lineup (2026-09-11).",
+    "Steffi and Francesco removed from band lineup (2026-09-11).",
+    "Leonhard displays as Leo; username leo."
+  ],
+  "members": [
+    {
+      "first_name": "Matt",
+      "last_name": "Divine",
+      "nickname": "Matt",
+      "username": "matt",
+      "whatsapp_display": null,
+      "status_seen": null,
+      "note": "A-section gap from WhatsApp screenshots; band lead"
+    },
+    {
+      "first_name": "Gregory",
+      "last_name": "Bowden",
+      "nickname": "Greg",
+      "username": "greg",
+      "whatsapp_display": "Gregory Bowden",
+      "status_seen": "Aweh ma se kinners!!!"
+    },
+    {
+      "first_name": "Salvador",
+      "last_name": "Castaneda Vega",
+      "nickname": "Chamba",
+      "username": "chamba",
+      "whatsapp_display": "Salvador Castaneda Vega",
+      "status_seen": "Hello world"
+    },
+    {
+      "first_name": "Alex",
+      "last_name": "Davydov",
+      "nickname": null,
+      "username": "alex.davydov",
+      "whatsapp_display": "Alex Davydov",
+      "status_seen": null
+    },
+    {
+      "first_name": "Dean",
+      "last_name": null,
+      "nickname": null,
+      "username": "dean",
+      "whatsapp_display": "Dean",
+      "status_seen": null
+    },
+    {
+      "first_name": "Mackey",
+      "last_name": "Divine",
+      "nickname": null,
+      "username": "mackey.divine",
+      "whatsapp_display": "Mackey Divine",
+      "status_seen": null
+    },
+    {
+      "first_name": "Helmut",
+      "last_name": null,
+      "nickname": null,
+      "username": "helmut",
+      "whatsapp_display": "Helmut",
+      "status_seen": "Hallo! Ich benutze WhatsApp."
+    },
+    {
+      "first_name": "Thomas",
+      "last_name": "Heß",
+      "nickname": null,
+      "username": "thomas.hess",
+      "whatsapp_display": "Thomas Heß",
+      "status_seen": null
+    },
+    {
+      "first_name": "Priantha",
+      "last_name": "Kamaladiwala",
+      "nickname": "Pree",
+      "username": "pree",
+      "whatsapp_display": "Priantha (Pree) Kamaladiwala",
+      "status_seen": null
+    },
+    {
+      "first_name": "Leonhard",
+      "last_name": "Gründer",
+      "nickname": "Leo",
+      "username": "leo",
+      "whatsapp_display": "Gründer Leonhard",
+      "status_seen": null,
+      "notes": "Display Leo; legal name Leonhard Gründer. WhatsApp contact was Gründer Leonhard."
+    },
+    {
+      "first_name": "Kenneth",
+      "last_name": "Möller",
+      "nickname": null,
+      "username": "kenneth.moeller",
+      "whatsapp_display": "Kenneth Möller",
+      "status_seen": null
+    },
+    {
+      "first_name": "Nuno",
+      "last_name": "Pires",
+      "nickname": null,
+      "username": "nuno.pires",
+      "whatsapp_display": "Nuno Pires",
+      "status_seen": "Hallo! Ich benutze WhatsApp."
+    },
+    {
+      "first_name": "Michael",
+      "last_name": "Walker",
+      "nickname": null,
+      "username": "michael.walker",
+      "whatsapp_display": "Michael Walker",
+      "status_seen": null
+    },
+    {
+      "first_name": "Manuel",
+      "last_name": "Dahm",
+      "nickname": null,
+      "username": "manuel.dahm",
+      "whatsapp_display": "Manuel Dahm",
+      "status_seen": null
+    }
+  ],
+  "missing": {
+    "count": 0,
+    "expected_total": 14,
+    "captured": 14,
+    "likely": "Member under A (not in screenshots) — often Mathew / group owner. Confirm with one more WhatsApp scroll of A–B.",
+    "suggested_placeholder": {
+      "first_name": "Mathew",
+      "last_name": "Divine",
+      "nickname": "Matt",
+      "username": "mathew",
+      "whatsapp_display": null,
+      "confirmed": false
+    }
+  }
+}

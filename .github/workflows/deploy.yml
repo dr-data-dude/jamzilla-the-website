@@ -44,25 +44,38 @@ jobs:
       - name: Upload site files to S3
         run: |
           set -euo pipefail
-          aws s3 cp index.html "s3://${{ steps.cfg.outputs.s3_bucket }}/index.html" \
+          BUCKET="s3://${{ steps.cfg.outputs.s3_bucket }}"
+          aws s3 cp index.html "${BUCKET}/index.html" \
             --content-type 'text/html; charset=utf-8' \
             --cache-control 'public, max-age=60'
+          # Pretty paths: /listen/ and /lineup/
+          aws s3 cp listen/index.html "${BUCKET}/listen/index.html" \
+            --content-type 'text/html; charset=utf-8' \
+            --cache-control 'public, max-age=60'
+          aws s3 cp lineup/index.html "${BUCKET}/lineup/index.html" \
+            --content-type 'text/html; charset=utf-8' \
+            --cache-control 'public, max-age=60'
+          # Session tapes
+          if [[ -d audio ]]; then
+            aws s3 sync audio "${BUCKET}/audio" \
+              --cache-control 'public, max-age=86400'
+          fi
           # Link-preview image (WhatsApp / Open Graph) — absolute URL in meta tags.
-          aws s3 cp og-image.jpg "s3://${{ steps.cfg.outputs.s3_bucket }}/og-image.jpg" \
+          aws s3 cp og-image.jpg "${BUCKET}/og-image.jpg" \
             --content-type 'image/jpeg' \
             --cache-control 'public, max-age=86400'
           # Browser tab icons
-          aws s3 cp favicon.svg "s3://${{ steps.cfg.outputs.s3_bucket }}/favicon.svg" \
+          aws s3 cp favicon.svg "${BUCKET}/favicon.svg" \
             --content-type 'image/svg+xml' \
             --cache-control 'public, max-age=86400'
-          aws s3 cp favicon-32.png "s3://${{ steps.cfg.outputs.s3_bucket }}/favicon-32.png" \
+          aws s3 cp favicon-32.png "${BUCKET}/favicon-32.png" \
             --content-type 'image/png' \
             --cache-control 'public, max-age=86400'
-          aws s3 cp apple-touch-icon.png "s3://${{ steps.cfg.outputs.s3_bucket }}/apple-touch-icon.png" \
+          aws s3 cp apple-touch-icon.png "${BUCKET}/apple-touch-icon.png" \
             --content-type 'image/png' \
             --cache-control 'public, max-age=86400'
           if [[ -d assets ]]; then
-            aws s3 sync assets "s3://${{ steps.cfg.outputs.s3_bucket }}/assets" \
+            aws s3 sync assets "${BUCKET}/assets" \
               --delete \
               --cache-control 'public, max-age=86400'
           fi
@@ -85,6 +98,18 @@ jobs:
             if [[ "${CODE}" == "200" ]]; then
               TITLE="$(curl -sS --max-time 15 "${URL}" | tr '\n' ' ' | grep -o '<title>[^<]*</title>' | head -1 || true)"
               echo "  ${TITLE}"
+              for path in /lineup/ /listen/; do
+                PCODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "${URL}${path}" || true)"
+                echo "  ${path} → HTTP ${PCODE}"
+                test "${PCODE}" = "200"
+              done
+              # CloudFront can 200 the homepage for missing keys — assert real pages.
+              LINEUP_TITLE="$(curl -sS --max-time 15 "${URL}/lineup/" | tr '\n' ' ' | grep -o '<title>[^<]*</title>' | head -1 || true)"
+              echo "  /lineup/ ${LINEUP_TITLE}"
+              echo "${LINEUP_TITLE}" | grep -qi 'Lineup'
+              LISTEN_TITLE="$(curl -sS --max-time 15 "${URL}/listen/" | tr '\n' ' ' | grep -o '<title>[^<]*</title>' | head -1 || true)"
+              echo "  /listen/ ${LISTEN_TITLE}"
+              echo "${LISTEN_TITLE}" | grep -qi 'Listen\|Recordings\|Jamzilla'
               exit 0
             fi
             sleep 10

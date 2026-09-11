@@ -1,0 +1,87 @@
+{
+  "project": "Jamzilla",
+  "source": "Numbers: Jamzilla-Notes on Songs and Videos → Songs For Website",
+  "notes": [
+    "These are the recorded Jamzilla session cuts — not Spotify playlists.",
+    "Cuts come from Nextcloud/session master files with start/end timings.",
+    "audio_url is relative to the teaser site root when a cut is ready."
+  ],
+  "set_list": {
+    "label": "Wedding set list",
+    "url": "https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE"
+  },
+  "recordings": [
+    {
+      "id": "curbing-the-slide",
+      "title": "Curbing the slide",
+      "source_file": "Jamzilla groove 14th - part 01.mp3",
+      "start": "5:17",
+      "end": "7:25",
+      "audio_url": "/audio/curbing-the-slide.mp3",
+      "ready": true
+    },
+    {
+      "id": "hanging-in-the-hills",
+      "title": "Hanging in the Hills",
+      "source_file": "Jamzilla groove 14th - part 01.mp3",
+      "start": "8:11",
+      "end": "16:14",
+      "audio_url": "/audio/hanging-in-the-hills.mp3",
+      "ready": true
+    },
+    {
+      "id": "ride-the-road",
+      "title": "Ride the Road",
+      "source_file": "Jamzilla groove 14th - part 01.mp3",
+      "start": "19:09",
+      "end": "26:28",
+      "audio_url": "/audio/ride-the-road.mp3",
+      "ready": true
+    },
+    {
+      "id": "funk-train-to-midnight",
+      "title": "Funk Train to Midnight",
+      "source_file": "Saturday - Jamzilla_Sessions - part  02.mp3",
+      "start": "0:24",
+      "end": "7:31",
+      "audio_url": null,
+      "ready": false
+    },
+    {
+      "id": "a-matt-fundae",
+      "title": "A Matt Fundae",
+      "source_file": "Saturday - Jamzilla_Sessions - part  01.mp3",
+      "start": "4:25",
+      "end": "11:43",
+      "audio_url": null,
+      "ready": false
+    },
+    {
+      "id": "very-superstitious",
+      "title": "Very Superstitious",
+      "source_file": "Saturday - Session_Jamzilla-Staturday-09-1730.mp3",
+      "start": "8:22",
+      "end": "15:45",
+      "audio_url": null,
+      "ready": false
+    },
+    {
+      "id": "after-the-superstition",
+      "title": "After the Superstition",
+      "source_file": "Session_Jamzilla-Staturday-09-1730.mp3",
+      "start": "15:45",
+      "end": "23:00",
+      "audio_url": null,
+      "ready": false
+    },
+    {
+      "id": "jamdom",
+      "title": "Jamdom",
+      "source_file": "Saturday -  Related Session.mp3",
+      "start": "0:00",
+      "end": "9:04",
+      "audio_url": null,
+      "ready": false
+    }
+  ]
+}

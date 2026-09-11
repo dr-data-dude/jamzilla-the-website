@@ -8,3 +8,6 @@
 infra/cloudfront-config.json
 infra/*.tmp
 /tmp/
+
+# Local cut masters (regenerate from Numbers timings)
+audio/

@@ -69,6 +69,117 @@ body{
   box-shadow:0 0 12px var(--red);
 }
 @keyframes blink{50%{opacity:.15}}
+
+/* ---------- big mac (sticky menu) ---------- */
+.bigmac{
+  position:fixed;
+  top:calc(env(safe-area-inset-top) + 10px);
+  left:14px;
+  z-index:80;
+  width:52px;height:52px;
+  border:1px solid color-mix(in srgb, var(--bone) 35%, transparent);
+  background:rgb(10 10 9 / 72%);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:grid;place-items:center;gap:0;
+  cursor:pointer;
+  color:var(--bone);
+  padding:0;
+}
+.bigmac:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.bigmac-bars{
+  display:grid;gap:7px;width:22px;
+}
+.bigmac-bars span{
+  display:block;height:3px;width:100%;
+  background:var(--bone);
+  transform-origin:center;
+  transition:transform .28s ease, opacity .2s ease, background .2s ease;
+}
+.bigmac[aria-expanded="true"] .bigmac-bars span:nth-child(1){
+  transform:translateY(10px) rotate(45deg);background:var(--red);
+}
+.bigmac[aria-expanded="true"] .bigmac-bars span:nth-child(2){opacity:0}
+.bigmac[aria-expanded="true"] .bigmac-bars span:nth-child(3){
+  transform:translateY(-10px) rotate(-45deg);background:var(--red);
+}
+.mac-scrim{
+  position:fixed;inset:0;z-index:70;
+  background:rgb(10 10 9 / 62%);
+  opacity:0;pointer-events:none;
+  transition:opacity .25s ease;
+}
+.mac-scrim.open{opacity:1;pointer-events:auto}
+.mac-drawer{
+  position:fixed;
+  top:0;left:0;bottom:0;
+  z-index:75;
+  width:min(340px, 88vw);
+  padding:calc(env(safe-area-inset-top) + 78px) 22px calc(env(safe-area-inset-bottom) + 28px);
+  background:var(--ink);
+  border-right:1px solid color-mix(in srgb, var(--bone) 18%, transparent);
+  transform:translateX(-105%);
+  transition:transform .32s cubic-bezier(.2,.8,.2,1);
+  display:flex;flex-direction:column;gap:18px;
+  overflow-y:auto;
+  pointer-events:none;
+}
+.mac-drawer.open{
+  transform:translateX(0);
+  pointer-events:auto;
+}
+.mac-drawer .mac-section{
+  margin:0 0 4px;
+  font-family:'Space Mono',monospace;
+  font-size:11px;line-height:1.35;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--smoke);
+  pointer-events:none;
+}
+.mac-group{display:grid;gap:2px}
+.mac-group + .mac-group{
+  margin-top:10px;padding-top:20px;
+  border-top:1px solid color-mix(in srgb, var(--bone) 14%, transparent);
+}
+.mac-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  color:var(--bone);
+  text-decoration:none;
+  font-family:'Anton',sans-serif;
+  font-size:1.55rem;letter-spacing:.03em;text-transform:uppercase;
+  line-height:1.05;
+  padding:10px 0;
+  border-bottom:1px solid color-mix(in srgb, var(--bone) 18%, transparent);
+}
+.mac-link::after{
+  content:"→";
+  flex:none;
+  font-family:'Space Mono',monospace;
+  font-size:14px;letter-spacing:0;
+  color:var(--smoke);
+  transition:color .2s ease, transform .2s ease;
+}
+.mac-link:hover,.mac-link:focus-visible{
+  color:var(--red);
+  border-bottom-color:var(--red);
+  outline:none;
+}
+.mac-link:hover::after,.mac-link:focus-visible::after{
+  color:var(--red);
+  transform:translateX(3px);
+}
+.mac-link small{
+  display:block;
+  margin-top:4px;
+  font-family:'Space Mono',monospace;
+  font-size:11px;letter-spacing:.08em;
+  color:var(--smoke);text-transform:uppercase;
+  font-weight:400;
+}
+body.mac-open{overflow:hidden}
+@media (prefers-reduced-motion: reduce){
+  .bigmac-bars span,.mac-drawer,.mac-scrim{transition:none}
+}
 /* ---------- hero ---------- */
 .hero{
   position:relative;min-height:100svh;
@@ -234,6 +345,13 @@ h1 .zilla{
   margin-top:26px;font-size:13px;line-height:1.8;color:var(--smoke);max-width:32ch;
 }
 .finale .tease b{color:var(--red);font-weight:700}
+.finale .band-cta{
+  margin-top:22px;font-size:12px;letter-spacing:.06em;color:var(--smoke);
+}
+.finale .band-cta a{
+  color:var(--bone);text-decoration:underline;text-underline-offset:3px;
+}
+.finale .band-cta a:hover{color:var(--red)}
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -246,6 +364,22 @@ h1 .zilla{
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
+
+<button type="button" class="bigmac" id="bigmac" aria-expanded="false" aria-controls="mac-drawer" aria-label="Open menu">
+  <span class="bigmac-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+</button>
+<div class="mac-scrim" id="mac-scrim" aria-hidden="true"></div>
+<nav class="mac-drawer" id="mac-drawer" aria-label="Jamzilla menu" aria-hidden="true">
+  <div class="mac-group">
+    <p class="mac-section">Jamzilla · the wedding sessions</p>
+    <a class="mac-link" href="https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE" target="_blank" rel="noopener noreferrer">Spotify playlist</a>
+    <a class="mac-link" href="/lineup/">Lineup</a>
+  </div>
+  <div class="mac-group">
+    <p class="mac-section">Jamzilla 2025</p>
+    <a class="mac-link" href="/listen/">All recordings</a>
+  </div>
+</nav>
 <div class="rec">REC</div>
 
 <!-- HERO -->
@@ -329,6 +463,11 @@ h1 .zilla{
   <p class="tag">Next session</p>
   <h3>Coming<br>soon<span class="cursor">_</span></h3>
   <p class="tease">The tapes are rolling. The amps are still warm.<br><b>You'll hear it before you see it.</b></p>
+  <p class="band-cta">
+    <a href="https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE" target="_blank" rel="noopener noreferrer">Wedding set list</a>
+    <span aria-hidden="true"> · </span>
+    <a href="/listen/">Listen to the tapes</a>
+  </p>
 </footer>
 
 <script>
@@ -357,6 +496,40 @@ function onScroll(){
 }
 window.addEventListener('scroll', onScroll, {passive:true});
 onScroll();
+
+// sticky big mac
+const bigmac = document.getElementById('bigmac');
+const drawer = document.getElementById('mac-drawer');
+const scrim = document.getElementById('mac-scrim');
+function setMac(open){
+  bigmac.setAttribute('aria-expanded', open ? 'true' : 'false');
+  bigmac.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+  scrim.setAttribute('aria-hidden', open ? 'false' : 'true');
+  document.body.classList.toggle('mac-open', open);
+  if(open){
+    // double-raf so the slide-in actually animates from off-canvas
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        drawer.classList.add('open');
+        scrim.classList.add('open');
+      });
+    });
+  }else{
+    drawer.classList.remove('open');
+    scrim.classList.remove('open');
+  }
+}
+bigmac.addEventListener('click', ()=>{
+  setMac(bigmac.getAttribute('aria-expanded') !== 'true');
+});
+scrim.addEventListener('click', ()=> setMac(false));
+drawer.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('click', ()=> setMac(false));
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') setMac(false);
+});
 </script>
 </body>
 </html>

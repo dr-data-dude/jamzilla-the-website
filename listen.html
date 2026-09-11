@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JAMZILLA — Listen</title>
+<meta name="description" content="Recorded Jamzilla session cuts — the room, not Spotify.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A09;
+  --bone:#EAE4D8;
+  --red:#FF2B18;
+  --smoke:#7A756C;
+  --panel:#141410;
+  --line:color-mix(in srgb, var(--bone) 16%, transparent);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--bone);
+  font-family:'Space Mono',monospace;
+  min-height:100svh;
+  -webkit-font-smoothing:antialiased;
+}
+.grain{
+  position:fixed;inset:-100px;z-index:50;pointer-events:none;opacity:.09;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.top{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;
+  background:color-mix(in srgb, var(--ink) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.brand{
+  font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:.04em;
+  color:var(--bone);text-decoration:none;text-transform:uppercase;
+}
+.brand span{color:var(--red)}
+.nav a{
+  color:var(--smoke);text-decoration:none;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;margin-left:14px;
+}
+.nav a:hover{color:var(--bone)}
+main{
+  max-width:720px;margin:0 auto;
+  padding:28px 18px calc(env(safe-area-inset-bottom) + 48px);
+}
+.kicker{
+  color:var(--smoke);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+h1{
+  font-family:'Anton',sans-serif;font-size:clamp(2.4rem, 8vw, 3.6rem);
+  line-height:.95;text-transform:uppercase;margin-bottom:10px;
+}
+.lede{color:var(--smoke);max-width:38ch;margin-bottom:28px;line-height:1.5}
+.track{
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:16px;
+  margin-bottom:12px;
+  scroll-margin-top:90px;
+}
+.track.playing{border-color:var(--red);box-shadow:inset 3px 0 0 var(--red)}
+.track-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.track h2{
+  font-family:'Anton',sans-serif;font-size:1.45rem;letter-spacing:.03em;
+  text-transform:uppercase;line-height:1.05;
+}
+.meta{color:var(--smoke);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+audio{width:100%;margin-top:12px;height:36px}
+.pending{
+  margin-top:12px;color:var(--smoke);font-size:12px;letter-spacing:.06em;
+}
+.setlist-link{
+  display:inline-block;margin-top:28px;color:var(--red);
+  text-underline-offset:3px;
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="top">
+  <a class="brand" href="/">Jam<span>zilla</span></a>
+  <nav class="nav" aria-label="Listen nav">
+    <a href="/">Home</a>
+    <a href="/lineup/">Lineup</a>
+    <a href="/listen/" aria-current="page">Listen</a>
+  </nav>
+</header>
+<main>
+  <p class="kicker">Session tapes</p>
+  <h1>Listen</h1>
+  <p class="lede">Cuts from the Jamzilla room — titled from the Nextcloud timing sheet. Not the Spotify stacks.</p>
+  <div id="tracks"></div>
+  <a class="setlist-link" href="https://open.spotify.com/playlist/6f6e66WO8VDz8ad9ESWgwE" target="_blank" rel="noopener noreferrer">Wedding set list on Spotify →</a>
+</main>
+<script>
+const RECORDINGS = [
+  {id:"curbing-the-slide", title:"Curbing the slide", start:"5:17", end:"7:25", audio_url:"/audio/curbing-the-slide.mp3", ready:true},
+  {id:"hanging-in-the-hills", title:"Hanging in the Hills", start:"8:11", end:"16:14", audio_url:"/audio/hanging-in-the-hills.mp3", ready:true},
+  {id:"ride-the-road", title:"Ride the Road", start:"19:09", end:"26:28", audio_url:"/audio/ride-the-road.mp3", ready:true},
+  {id:"funk-train-to-midnight", title:"Funk Train to Midnight", start:"0:24", end:"7:31", audio_url:null, ready:false},
+  {id:"a-matt-fundae", title:"A Matt Fundae", start:"4:25", end:"11:43", audio_url:null, ready:false},
+  {id:"very-superstitious", title:"Very Superstitious", start:"8:22", end:"15:45", audio_url:null, ready:false},
+  {id:"after-the-superstition", title:"After the Superstition", start:"15:45", end:"23:00", audio_url:null, ready:false},
+  {id:"jamdom", title:"Jamdom", start:"0:00", end:"9:04", audio_url:null, ready:false}
+];
+
+const root = document.getElementById('tracks');
+root.innerHTML = RECORDINGS.map((song) => {
+  const body = song.ready
+    ? `<audio controls preload="none" src="${song.audio_url}" data-id="${song.id}"></audio>`
+    : `<p class="pending">Tape pending — master still in Nextcloud (${song.start} → ${song.end})</p>`;
+  return `<article class="track" id="${song.id}">
+    <div class="track-head">
+      <h2>${song.title}</h2>
+      <span class="meta">${song.start} – ${song.end}</span>
+    </div>
+    ${body}
+  </article>`;
+}).join('');
+
+root.querySelectorAll('audio').forEach((audio) => {
+  audio.addEventListener('play', () => {
+    root.querySelectorAll('audio').forEach((other) => {
+      if (other !== audio) other.pause();
+    });
+    root.querySelectorAll('.track').forEach((node) => node.classList.remove('playing'));
+    audio.closest('.track')?.classList.add('playing');
+  });
+});
+
+const hash = location.hash.replace('#','');
+if (hash) {
+  const node = document.getElementById(hash);
+  node?.scrollIntoView({behavior:'smooth', block:'start'});
+  const audio = node?.querySelector('audio');
+  if (audio) {
+    audio.play().catch(() => {});
+  }
+}
+</script>
+</body>
+</html>
