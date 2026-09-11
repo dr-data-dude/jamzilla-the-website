@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Ensure CloudFront rewrites /lineup/ → /lineup/index.html (S3 REST + OAC has no dir indexes).
-# Idempotent: if the LIVE function is already on the distribution, exit 0.
-# GitHub OIDC may lack cloudfront:CreateFunction — in that case we keep shipping
-# after a one-time local attach (this script with admin/SSO creds).
+# Idempotent. GitHub OIDC may lack cloudfront:*Function* — then we skip and let smoke
+# prove /lineup/ (one-time local attach with admin/SSO is enough).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -13,14 +12,45 @@ FN_NAME="jamzilla-directory-index"
 FN_FILE="${ROOT}/infra/cloudfront-directory-index.js"
 DIST_ID="${CLOUDFRONT_DISTRIBUTION_ID}"
 
-already_associated() {
-  aws cloudfront get-distribution-config --id "${DIST_ID}" \
-    --query "DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items[?contains(FunctionARN, \`${FN_NAME}\`)].FunctionARN" \
-    --output text 2>/dev/null | grep -q "${FN_NAME}"
+association_state() {
+  # prints: associated | missing | unknown
+  python3 - <<'PY' "${DIST_ID}" "${FN_NAME}"
+import json, subprocess, sys
+dist_id, fn_name = sys.argv[1], sys.argv[2]
+proc = subprocess.run(
+    ["aws", "cloudfront", "get-distribution-config", "--id", dist_id, "--output", "json"],
+    capture_output=True,
+    text=True,
+)
+if proc.returncode != 0:
+    sys.stderr.write(proc.stderr)
+    print("unknown")
+    raise SystemExit(0)
+doc = json.loads(proc.stdout)
+items = (
+    doc.get("DistributionConfig", {})
+    .get("DefaultCacheBehavior", {})
+    .get("FunctionAssociations", {})
+    .get("Items")
+    or []
+)
+if any(fn_name in (item.get("FunctionARN") or "") for item in items):
+    print("associated")
+else:
+    print("missing")
+PY
 }
 
-if already_associated; then
+STATE="$(association_state)"
+echo "Function association state: ${STATE}"
+
+if [[ "${STATE}" == "associated" ]]; then
   echo "CloudFront already has ${FN_NAME} on ${DIST_ID} — skip attach."
+  exit 0
+fi
+
+if [[ "${STATE}" == "unknown" ]]; then
+  echo "WARN: cannot read distribution config (likely IAM). Skipping attach; smoke must prove /lineup/." >&2
   exit 0
 fi
 
@@ -28,17 +58,15 @@ echo "Publishing CloudFront Function ${FN_NAME}"
 
 if ! OUT="$(aws cloudfront describe-function --name "${FN_NAME}" 2>&1)"; then
   if echo "${OUT}" | grep -qi AccessDenied; then
-    echo "WARN: no permission to manage CloudFront Functions, and ${FN_NAME} is not on the distribution yet." >&2
-    echo "Run infra/ensure-directory-index.sh once with admin credentials, then redeploy." >&2
-    exit 1
+    echo "WARN: no permission to manage CloudFront Functions. Skipping; smoke must prove /lineup/." >&2
+    exit 0
   fi
-  # Not found — create
   if ! aws cloudfront create-function \
     --name "${FN_NAME}" \
     --function-config 'Comment="Rewrite directory URLs to index.html",Runtime=cloudfront-js-2.0' \
     --function-code "fileb://${FN_FILE}"; then
-    echo "WARN: CreateFunction failed. Run this script locally with broader IAM, then redeploy." >&2
-    exit 1
+    echo "WARN: CreateFunction failed. Skipping; smoke must prove /lineup/." >&2
+    exit 0
   fi
 else
   ETAG="$(aws cloudfront describe-function --name "${FN_NAME}" --query 'ETag' --output text)"
