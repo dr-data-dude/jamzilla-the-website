@@ -55,10 +55,16 @@ jobs:
           aws s3 cp lineup/index.html "${BUCKET}/lineup/index.html" \
             --content-type 'text/html; charset=utf-8' \
             --cache-control 'public, max-age=60'
-          # Session tapes
-          if [[ -d audio ]]; then
+          # Session tapes (gitignored binaries — present only on break-glass
+          # checkouts or when an operator ran scripts/sync-audio.sh).
+          # Do NOT --delete: CI without audio/ must not wipe live cuts.
+          if [[ -d audio ]] && compgen -G 'audio/*' > /dev/null; then
             aws s3 sync audio "${BUCKET}/audio" \
+              --exclude '.DS_Store' \
+              --content-type 'audio/mpeg' \
               --cache-control 'public, max-age=86400'
+          else
+            echo "No local audio/ tree — leaving existing S3 audio objects alone"
           fi
           # Link-preview image (WhatsApp / Open Graph) — absolute URL in meta tags.
           aws s3 cp og-image.jpg "${BUCKET}/og-image.jpg" \
@@ -112,12 +118,28 @@ jobs:
             echo "  /lineup/ ${LINEUP_TITLE}"
             echo "  /listen/ ${LISTEN_TITLE}"
             # Custom error responses return homepage HTML with 200 — require real titles.
-            if echo "${LINEUP_TITLE}" | grep -qi 'Lineup' \
-              && echo "${LISTEN_TITLE}" | grep -qiE 'Listen|Recordings'; then
+            if ! echo "${LINEUP_TITLE}" | grep -qi 'Lineup' \
+              || ! echo "${LISTEN_TITLE}" | grep -qiE 'Listen|Recordings'; then
+              echo "  waiting for directory-index rewrite / cache…"
+              sleep 10
+              continue
+            fi
+            # Ready Listen cuts must be real MPEG, not CF custom-error HTML.
+            AUDIO_OK=1
+            for cut in curbing-the-slide hanging-in-the-hills; do
+              CT="$(curl -sS -I --max-time 15 "${URL}/audio/${cut}.mp3" \
+                | tr -d '\r' \
+                | awk -F': ' 'tolower($1)=="content-type"{print $2; exit}')"
+              echo "  /audio/${cut}.mp3 Content-Type: ${CT}"
+              if ! echo "${CT}" | grep -qi 'audio/mpeg'; then
+                AUDIO_OK=0
+              fi
+            done
+            if [[ "${AUDIO_OK}" -eq 1 ]]; then
               exit 0
             fi
-            echo "  waiting for directory-index rewrite / cache…"
+            echo "  waiting for audio objects / cache…"
             sleep 10
           done
-          echo "Smoke failed — pretty /lineup/ or /listen/ never showed real titles" >&2
+          echo "Smoke failed — pretty pages or /audio/*.mp3 (need audio/mpeg) not ready" >&2
           exit 1

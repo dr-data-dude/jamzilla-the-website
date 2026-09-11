@@ -100,11 +100,21 @@ git push origin main
 Workflow `.github/workflows/deploy.yml`:
 
 1. Assume `github-actions-jamzilla-the-website` via OIDC  
-2. `aws s3 sync` the site root → bucket (HTML + any future static files)  
+2. Upload HTML / icons / assets; sync `audio/` only when that tree exists in the runner  
 3. Invalidate CloudFront paths `/*`  
-4. Smoke `https://jamzilla.dr-data-dude.com`
+4. Smoke `https://jamzilla.dr-data-dude.com` (pretty `/listen/` + `/lineup/`, and ready `/audio/*.mp3` as `audio/mpeg`)
 
 Manual re-run: Actions → Deploy → Run workflow.
+
+### Session tapes (`audio/`)
+
+MP3 cuts are **gitignored** (large binaries). CI will not invent them. After cutting new tracks locally:
+
+```bash
+./scripts/sync-audio.sh
+```
+
+That uploads with `Content-Type: audio/mpeg` and invalidates `/audio/*`. Without the objects in S3, CloudFront’s custom 403/404→`index.html` response makes players fetch homepage HTML instead of sound.
 
 ---
 
@@ -115,7 +125,8 @@ set -a && source infra/deploy.env && set +a
 aws s3 sync . "s3://${S3_BUCKET}/" \
   --exclude '.git/*' --exclude '.github/*' --exclude 'scripts/*' \
   --exclude 'infra/*' --exclude 'README.md' --exclude '.gitignore' \
-  --exclude '*.md'
+  --exclude '*.md' --exclude 'audio/*'
+./scripts/sync-audio.sh   # when local cuts exist
 aws cloudfront create-invalidation \
   --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
   --paths '/*'
