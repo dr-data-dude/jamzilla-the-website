@@ -91,27 +91,24 @@ body{
 .auth-name[hidden]{display:none!important}
 .auth-logout{
   position:fixed;
-  top:calc(env(safe-area-inset-top) + 10px);
+  top:calc(env(safe-area-inset-top) + 14px);
   right:16px;
   z-index:70;
+  display:flex;align-items:center;
+  margin:0;padding:0;
+  border:none;background:transparent;
   min-height:44px;
-  padding:10px 14px;
-  border:1px solid color-mix(in srgb, var(--bone) 35%, transparent);
-  background:rgb(10 10 9 / 72%);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  color:var(--bone);
   font-family:'Space Mono',monospace;
-  font-size:11px;
-  letter-spacing:.14em;
+  font-size:11px;letter-spacing:.2em;color:var(--bone);
   text-transform:uppercase;
+  mix-blend-mode:difference;
   cursor:pointer;
 }
-.auth-logout:hover{border-color:var(--red);color:var(--red)}
+.auth-logout:hover{color:var(--red)}
 .auth-logout:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 .auth-logout[hidden]{display:none!important}
 body.has-session .rec{
-  right:118px;
+  right:108px;
 }
 
 /* ---------- big mac (sticky menu) ---------- */
