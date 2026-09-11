@@ -61,25 +61,45 @@ body{
   0%{transform:translate(0,0)}25%{transform:translate(-30px,20px)}
   50%{transform:translate(20px,-30px)}75%{transform:translate(-20px,-20px)}100%{transform:translate(0,0)}
 }
-/* ---------- top-right rail (REC + session Log out) ---------- */
-.auth-rail{
+/* ---------- one top chrome bar (Big Mac · name · REC/Log out) ---------- */
+.chrome-bar{
   position:fixed;
-  top:calc(env(safe-area-inset-top) + 14px);
-  right:max(12px, env(safe-area-inset-right));
-  z-index:70;
+  top:0;left:0;right:0;
+  z-index:80;
+  display:grid;
+  grid-template-columns:minmax(52px,1fr) auto minmax(52px,1fr);
+  align-items:center;
+  column-gap:8px;
+  padding:
+    calc(env(safe-area-inset-top) + 10px)
+    max(12px, env(safe-area-inset-right))
+    10px
+    max(12px, env(safe-area-inset-left));
+  pointer-events:none;
+  max-width:100%;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+.chrome-bar > .bigmac{justify-self:start;grid-column:1}
+.chrome-bar > .auth-name{justify-self:center;grid-column:2;max-width:min(36vw,180px)}
+.chrome-bar > .auth-rail{justify-self:end;grid-column:3;max-width:100%}
+
+.auth-rail{
   display:flex;
   flex-wrap:nowrap;
   align-items:center;
   gap:8px;
-  max-width:calc(100vw - 88px);
+  min-height:52px;
   pointer-events:none;
   mix-blend-mode:difference;
 }
 .rec{
   display:flex;align-items:center;gap:6px;
   flex:none;
+  height:52px;
   font-size:11px;letter-spacing:.16em;color:var(--bone);
   white-space:nowrap;
+  line-height:1;
 }
 .rec::before{
   content:'';width:9px;height:9px;border-radius:50%;flex:none;
@@ -91,35 +111,33 @@ body{
 
 /* ---------- auth chrome (band :8791 session) ---------- */
 .auth-name{
-  position:fixed;
-  top:calc(env(safe-area-inset-top) + 18px);
-  left:50%;
-  transform:translateX(-50%);
-  z-index:65;
+  margin:0;
   font-family:'Anton',sans-serif;
   font-size:clamp(1.05rem, 3.2vw, 1.55rem);
   letter-spacing:.06em;
   text-transform:uppercase;
   color:var(--bone);
   pointer-events:none;
-  max-width:min(38vw, 180px);
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
   text-align:center;
-  line-height:1.1;
+  line-height:1;
+  mix-blend-mode:difference;
   text-shadow:0 1px 12px rgb(10 10 9 / 70%);
 }
 .auth-name[hidden]{display:none!important}
 .auth-logout{
-  display:flex;align-items:center;
-  margin:0;padding:10px 0 10px 2px;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin:0;padding:0 2px;
   border:none;background:transparent;
+  height:52px;
   min-height:44px;
   font-family:'Space Mono',monospace;
   font-size:11px;letter-spacing:.1em;color:var(--bone);
   text-transform:uppercase;
   white-space:nowrap;
+  line-height:1;
   flex:none;
   pointer-events:auto;
   cursor:pointer;
@@ -131,10 +149,8 @@ body:not(.has-session) .auth-logout{display:none!important}
 
 /* ---------- big mac (sticky menu) ---------- */
 .bigmac{
-  position:fixed;
-  top:calc(env(safe-area-inset-top) + 10px);
-  left:14px;
-  z-index:80;
+  position:relative;
+  z-index:1;
   width:52px;height:52px;
   border:1px solid color-mix(in srgb, var(--bone) 35%, transparent);
   background:rgb(10 10 9 / 72%);
@@ -144,6 +160,8 @@ body:not(.has-session) .auth-logout{display:none!important}
   cursor:pointer;
   color:var(--bone);
   padding:0;
+  pointer-events:auto;
+  flex:none;
 }
 .bigmac:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 .bigmac-bars{
@@ -236,6 +254,11 @@ body:not(.has-session) .auth-logout{display:none!important}
   font-weight:400;
 }
 body.mac-open{overflow:hidden}
+@media (max-width:380px){
+  .auth-logout{font-size:10px;letter-spacing:.06em}
+  .chrome-bar > .auth-name{max-width:min(30vw,120px);font-size:clamp(.95rem, 4vw, 1.2rem)}
+  .auth-rail{gap:6px}
+}
 @media (prefers-reduced-motion: reduce){
   .bigmac-bars span,.mac-drawer,.mac-scrim{transition:none}
 }
@@ -425,9 +448,16 @@ h1 .zilla{
 <body>
 <div class="grain" aria-hidden="true"></div>
 
-<button type="button" class="bigmac" id="bigmac" aria-expanded="false" aria-controls="mac-drawer" aria-label="Open menu">
-  <span class="bigmac-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-</button>
+<div class="chrome-bar" role="banner">
+  <button type="button" class="bigmac" id="bigmac" aria-expanded="false" aria-controls="mac-drawer" aria-label="Open menu">
+    <span class="bigmac-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+  <p class="auth-name" id="auth-name" hidden></p>
+  <div class="auth-rail" id="auth-rail">
+    <div class="rec" aria-hidden="true">REC</div>
+    <button type="button" class="auth-logout" id="auth-logout" hidden>Log out</button>
+  </div>
+</div>
 <div class="mac-scrim" id="mac-scrim" aria-hidden="true"></div>
 <nav class="mac-drawer" id="mac-drawer" aria-label="Jamzilla menu" aria-hidden="true">
   <div class="mac-group">
@@ -440,11 +470,6 @@ h1 .zilla{
     <a class="mac-link" href="/listen/">All recordings</a>
   </div>
 </nav>
-<p class="auth-name" id="auth-name" hidden></p>
-<div class="auth-rail" id="auth-rail">
-  <div class="rec" aria-hidden="true">REC</div>
-  <button type="button" class="auth-logout" id="auth-logout" hidden>Log out</button>
-</div>
 
 <!-- HERO -->
 <header class="hero">
